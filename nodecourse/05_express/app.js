@@ -21,9 +21,9 @@ app.get('api/users', (req, res)=>{
 
 //Send a id to prove what tyoe of http req use 
 app.get('api/users/:id', (req, res)=>{
-   let user = users.find(u => u.id === parseInt(req.params.id)); 
+   let user = user.find(u => u.id === parseInt(req.params.id)); 
    if(!user) res.status(404).send('the user can be chatch');
-    res.send(user)
+    res.send(user);
 });
 
 
