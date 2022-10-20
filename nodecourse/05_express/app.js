@@ -1,21 +1,40 @@
-
 const {json} = require('express');
+const loger = require('./logger');
 const express = require('express');
 const Joi = require('@hapi/joi');
 const {error} = require('@hapi/joi/lib/annotate');
 const app = express();
 
+app.use(express.json()); //? Peticiones del body   
 
-app.use(express.json());
+//* middleware encode
+
+app.use(express.urlencoded({
+    extended:true}
+    ));
+
+
+//* middleware encode
+
+
+// ?primer middoelware se ejecutann primero en las rutas 
+app.use(function(req, res, next){
+    console.log(`login...`);
+    next();
+})
+app.use(loger);
+
+
+app.use(function(req, res, next){
+ console.log('auth...');
+ next();
+});
 
 const users = [
     {id:1, name:'Jaz'},
     {id:2, name:'Luis'},
-    {id:3, name:'Marth'}
- 
+    {id:3, name:'Marth'}    
 ];
-
-
 app.get('/', (req, res) => {
     res.send("im a test");
 });
@@ -24,6 +43,7 @@ app.get('/', (req, res) => {
 app.get('/api/users', (req, res)=>{
     res.send(['Grover', 'Luis', 'Ana']);
 });
+
 
 //Send a id to prove what tyoe of http req use 
 app.get('/api/users/:id', (req, res)=>{
@@ -36,7 +56,7 @@ app.post('/api/users/', (req, res)=>{
      //ADD joi in to validate info
 
 
-    const schema = Joi.object({
+   const schema = Joi.object({
 	name: Joi.string().min(3).required()
     });
    const {error, value}  =  schema.validate({name: req.body.name});
@@ -51,7 +71,7 @@ app.post('/api/users/', (req, res)=>{
 	const notmesg = error.details[0].message;
 	res.status(400).send(notmesg);
 
-    }
+   }
 
     //ADD joi in to validate info
 
@@ -70,11 +90,9 @@ app.post('/api/users/', (req, res)=>{
     // res.send(user);
 });
 
-
-
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
 
     console.log("lsiten in the port", port);
-});
+});  
